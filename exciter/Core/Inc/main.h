@@ -84,8 +84,6 @@ void Error_Handler(void);
 #define DIVOUT_GPIO_Port GPIOA
 #define MOSI_Pin GPIO_PIN_1
 #define MOSI_GPIO_Port GPIOB
-#define REFOUT_Pin GPIO_PIN_9
-#define REFOUT_GPIO_Port GPIOA
 #define RXD_Pin GPIO_PIN_10
 #define RXD_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
