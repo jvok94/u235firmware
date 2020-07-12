@@ -7,7 +7,7 @@
 #define M_TXBUF_LENGTH 32 //bytes
 uint8_t m_txBuf0[M_TXBUF_LENGTH];
 uint8_t m_txBuf1[M_TXBUF_LENGTH];
-uint8_t m_activeTxBuf = 0;
+uint8_t *m_activeTxBuf = m_txBuf0;
 volatile bool m_txDone = true;
 
 void DMA1_Channel4_5_IRQHandler(void)
@@ -58,26 +58,23 @@ void uart_transmit(const uint8_t *buffer, uint16_t length)
 			nextTransferLength = M_TXBUF_LENGTH;
 		}
 
-		uint8_t nextTxBuf;
-		uint8_t *nextTxBufPtr;
-		if (m_activeTxBuf == 0)
+		uint8_t *nextTxBuf;
+		if (m_activeTxBuf == m_txBuf0)
 		{
-			nextTxBuf = 1;
-			nextTxBufPtr = m_txBuf1;
+			nextTxBuf = m_txBuf1;
 		}
 		else
 		{
-			nextTxBuf = 0;
-			nextTxBufPtr = m_txBuf0;
+			nextTxBuf = m_txBuf0;
 		}
 
-		memcpy(nextTxBufPtr, buffer + txCount, nextTransferLength);
+		memcpy(nextTxBuf, buffer + txCount, nextTransferLength);
 		while (!m_txDone)
 		{
 			__WFI(); //Wait for last transfer to complete
 		}
 
-		DMA1_Channel4->CMAR = (uint32_t)nextTxBufPtr;
+		DMA1_Channel4->CMAR = (uint32_t)nextTxBuf;
 		DMA1_Channel4->CNDTR = nextTransferLength;
 		m_activeTxBuf = nextTxBuf;
 		m_txDone = false;
